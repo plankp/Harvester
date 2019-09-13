@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+mainClassName = 'org.atoiks.games.harvest.Main'
+
+task copyLicense {
+    outputs.file new File("$buildDir/COPYING")
+    outputs.file new File("$buildDir/README.md")
+    doLast {
+        copy {
+            from "../COPYING"
+            into "$buildDir"
+        }
+        copy {
+            from "../README.md"
+            into "$buildDir"
+        }
+    }
+}
+
+applicationDistribution.from(copyLicense) {
+    into ""
+}
