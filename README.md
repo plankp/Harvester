@@ -10,7 +10,14 @@ Run `gradlew build` to build it or `gradlew run` to run after building
 
 ## Game Instructions
 
-*   If you see grass or flowers tiles, click on them!
+*   Over time, plants will spawn randomly in the field
+*   When this happens, the game will notify you with a beep sound
+*   Click on grass or flowers to harvest them (a.k.a **_gain points_**)
+
+### Notes
+
+*   Unharvested grass will grow into flowers
+*   Leaving flowers unharvested for too long will cause them to wither (a.k.a **_game over_**)
 *   Move the screen around to see the whole field (hence the screen abuse part~)
 *   Hold `S` to access the score overlay. During this time, the game is paused!
 
