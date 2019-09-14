@@ -230,9 +230,9 @@ public class GameFrame extends JPanel {
     }
 
     private void genericScoreRender(Graphics2D g) {
-        Plant.Phase.PHASE_1.renderImage(g, 40, 40, 30, 30);
-        Plant.Phase.PHASE_2.renderImage(g, 40, 100, 30, 30);
-        Plant.Phase.PHASE_3.renderImage(g, 40, 160, 30, 30);
+        Plant.PHASE_1.renderImage(g, 40, 40, 30, 30);
+        Plant.PHASE_2.renderImage(g, 40, 100, 30, 30);
+        Plant.PHASE_3.renderImage(g, 40, 160, 30, 30);
 
         g.setFont(this.font16);
         g.setColor(Color.black);

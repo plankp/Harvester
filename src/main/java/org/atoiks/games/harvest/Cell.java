@@ -20,7 +20,7 @@ public class Cell {
     private final double cellWidth;
     private final double cellHeight;
 
-    private final Plant[][] grid = new Plant[VIRTUAL_SIDE][VIRTUAL_SIDE];
+    private final PlantCell[][] grid = new PlantCell[VIRTUAL_SIDE][VIRTUAL_SIDE];
 
     public Cell(final double width, final double height, Score score) {
         this.rect = new Rectangle2D.Double(0, 0, width, height);
@@ -29,7 +29,7 @@ public class Cell {
         this.cellHeight = height / VIRTUAL_SIDE;
         for (int i = 0; i < VIRTUAL_SIDE; ++i) {
             for (int j = 0; j < VIRTUAL_SIDE; ++j) {
-                this.grid[i][j] = new Plant(this.cellWidth, this.cellHeight, score);
+                this.grid[i][j] = new PlantCell(this.cellWidth, this.cellHeight, score);
             }
         }
     }
@@ -50,7 +50,7 @@ public class Cell {
         // Randomly select a plant-cell
         final int x = RAND_GEN.nextInt(VIRTUAL_SIDE);
         final int y = RAND_GEN.nextInt(VIRTUAL_SIDE);
-        final Plant cell = this.grid[x][y];
+        final PlantCell cell = this.grid[x][y];
 
         // Only grow if it is vacant
         if (!cell.isGrowing()) {
