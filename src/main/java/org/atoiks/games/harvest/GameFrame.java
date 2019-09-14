@@ -33,8 +33,6 @@ public class GameFrame extends JPanel {
     private static final int PADDING_Y = 80;
 
     private Insets insets;
-    private boolean renderScoreOverlay = false;
-    private boolean gameOver = false;
 
     private float time = 0;
     private float limit = LIMIT_UPPER_BOUND;
@@ -51,6 +49,8 @@ public class GameFrame extends JPanel {
     private final Cell[][] grid = new Cell[VIRTUAL_WIDTH][VIRTUAL_HEIGHT];
 
     private final Score score = new Score();
+
+    private State currentState = new GamePlayState();
 
     public GameFrame(Font fnt) {
         this.font16 = fnt.deriveFont(16f);
@@ -76,29 +76,7 @@ public class GameFrame extends JPanel {
     }
 
     public void update(final float dt) {
-        if (this.renderScoreOverlay || this.gameOver) return;
-
-        for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
-            for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
-                if (!this.grid[i][j].update(dt)) {
-                    this.gameOver = true;
-                    return;
-                }
-            }
-        }
-
-        if ((this.time += dt) > this.limit) {
-            // Reset timer
-            this.time -= this.limit;
-
-            // Make growth-trigger go faster
-            this.limit = Math.max(this.limit - dt, LIMIT_LOWER_BOUND);
-
-            // Randomly select a cell to try to grow!
-            final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
-            final int y = RAND_GEN.nextInt(VIRTUAL_HEIGHT);
-            this.grid[x][y].requestGrowing();
-        }
+        this.currentState.update(dt);
     }
 
     private Point2D getCellPoint(int i, int j) {
@@ -109,55 +87,66 @@ public class GameFrame extends JPanel {
 
     @Override
     public void paintComponent(final Graphics gr) {
-        if (this.insets == null) return;
+        this.currentState.render((Graphics2D) gr);
+    }
 
-        final Graphics2D g = (Graphics2D) gr;
-        if (this.renderScoreOverlay || this.gameOver) {
-            g.setColor(Color.gray);
-            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    public void onKeyPressed(KeyEvent evt) {
+        this.currentState.onKeyPressed(evt);
+    }
 
-            if (this.gameOver) {
-                g.setFont(this.font48);
-                g.setColor(Color.black);
-                g.drawString("GAME OVER!", 200, 60);
-                g.translate(0, 80);
+    public void onKeyReleased(KeyEvent evt) {
+        this.currentState.onKeyReleased(evt);
+    }
+
+    public void onMouseClicked(MouseEvent evt) {
+        this.currentState.onMouseClicked(evt);
+    }
+
+    private class GamePlayState implements State {
+
+        @Override
+        public void update(float dt) {
+            for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
+                for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
+                    if (!GameFrame.this.grid[i][j].update(dt)) {
+                        GameFrame.this.currentState = new GameOverState();
+                        return;
+                    }
+                }
             }
 
-            g.setColor(Plant.PHASE_1);
-            g.fillRect(40, 40, 10, 10);
-            g.setColor(Plant.PHASE_2);
-            g.fillRect(40, 60, 10, 10);
-            g.setColor(Plant.PHASE_3);
-            g.fillRect(40, 80, 10, 10);
+            if ((GameFrame.this.time += dt) > GameFrame.this.limit) {
+                // Reset timer
+                GameFrame.this.time -= GameFrame.this.limit;
 
-            g.setFont(this.font16);
-            g.setColor(Color.black);
-            g.drawString("x" + this.score.getType1(), 85, 40 + 10);
-            g.drawString("x" + this.score.getType2(), 85, 60 + 10);
-            g.drawString("x" + this.score.getType3(), 85, 80 + 10);
+                // Make growth-trigger go faster
+                GameFrame.this.limit = Math.max(GameFrame.this.limit - dt, LIMIT_LOWER_BOUND);
 
-            g.drawString("Score", 40, 120);
-            g.drawString(Integer.toString(this.score.getScore()), 85, 120);
-
-            if (this.renderScoreOverlay) {
-                g.drawString("ETA", 40, 160);
-                g.drawString(String.format("%.2fs", Math.max(this.limit - this.time, 0)), 85, 160);
+                // Randomly select a cell to try to grow!
+                final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
+                final int y = RAND_GEN.nextInt(VIRTUAL_HEIGHT);
+                GameFrame.this.grid[x][y].requestGrowing();
             }
-        } else {
-            g.setColor(Color.black);
-            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        }
 
-            final Point origin = this.getLocationOnScreen();
-            final double tx = this.insets.left - origin.getX();
-            final double ty = this.insets.top - origin.getY();
+        @Override
+        public void render(Graphics2D g) {
+            g.setColor(Color.black);
+            g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
+
+            if (insets == null) return;
+
+            final Point origin = GameFrame.this.getLocationOnScreen();
+            final double tx = GameFrame.this.insets.left - origin.getX();
+            final double ty = GameFrame.this.insets.top - origin.getY();
             g.translate(tx, ty);
 
             for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
                 for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
-                    final Point2D p = this.getCellPoint(i, j);
+                    final Point2D p = GameFrame.this.getCellPoint(i, j);
                     g.translate(p.getX(), p.getY());
 
-                    final Cell cell = this.grid[i][j];
+                    final Cell cell = GameFrame.this.grid[i][j];
                     g.setColor(Color.white);
                     cell.renderOutline(g);
                     cell.renderPlants(g);
@@ -166,36 +155,93 @@ public class GameFrame extends JPanel {
                 }
             }
         }
-    }
 
-    public void onKeyPressed(KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_S) {
-            this.renderScoreOverlay = true;
+        @Override
+        public void onKeyPressed(KeyEvent evt) {
+            if (evt.getKeyCode() == KeyEvent.VK_S) {
+                GameFrame.this.currentState = new PauseState();
+            }
+        }
+
+        @Override
+        public void onMouseClicked(MouseEvent evt) {
+            if (insets == null) return;
+
+            final int xScr = evt.getXOnScreen() - insets.left;
+            final int yScr = evt.getYOnScreen() - insets.top;
+
+            // Ignore out of grid clicks
+            if (xScr < PADDING_X || xScr > screenWidth - PADDING_X) return;
+            if (yScr < PADDING_Y || yScr > screenHeight - PADDING_Y) return;
+
+            // Map it to virtual (grid) coordinates
+
+            final int xCell = (int) ((xScr - PADDING_X) / cellWidth);
+            final int yCell = (int) ((yScr - PADDING_Y) / cellHeight);
+
+            final Point2D p = getCellPoint(xCell, yCell);
+            grid[xCell][yCell].onClick(xScr - p.getX(), yScr - p.getY());
         }
     }
 
-    public void onKeyReleased(KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_S) {
-            this.renderScoreOverlay = false;
+    private class PauseState implements State {
+
+        @Override
+        public void update(float dt) { /* do nothing */ }
+
+        @Override
+        public void render(Graphics2D g) {
+            g.setColor(Color.gray);
+            g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
+
+            GameFrame.this.genericScoreRender(g);
+
+            g.drawString("ETA", 40, 160);
+            g.drawString(String.format("%.2fs", Math.max(GameFrame.this.limit - GameFrame.this.time, 0)), 85, 160);
+        }
+
+        @Override
+        public void onKeyReleased(KeyEvent evt) {
+            if (evt.getKeyCode() == KeyEvent.VK_S) {
+                GameFrame.this.currentState = new GamePlayState();
+            }
         }
     }
 
-    public void onMouseClicked(MouseEvent evt) {
-        if (insets == null) return;
+    private class GameOverState implements State {
 
-        final int xScr = evt.getXOnScreen() - insets.left;
-        final int yScr = evt.getYOnScreen() - insets.top;
+        @Override
+        public void update(float dt) { /* do nothing */ }
 
-        // Ignore out of grid clicks
-        if (xScr < PADDING_X || xScr > screenWidth - PADDING_X) return;
-        if (yScr < PADDING_Y || yScr > screenHeight - PADDING_Y) return;
+        @Override
+        public void render(Graphics2D g) {
+            g.setColor(Color.gray);
+            g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
 
-        // Map it to virtual (grid) coordinates
+            g.setFont(GameFrame.this.font48);
+            g.setColor(Color.black);
+            g.drawString("GAME OVER!", 200, 60);
+            g.translate(0, 80);
 
-        final int xCell = (int) ((xScr - PADDING_X) / cellWidth);
-        final int yCell = (int) ((yScr - PADDING_Y) / cellHeight);
+            GameFrame.this.genericScoreRender(g);
+        }
+    }
 
-        final Point2D p = getCellPoint(xCell, yCell);
-        grid[xCell][yCell].onClick(xScr - p.getX(), yScr - p.getY());
+    private void genericScoreRender(Graphics2D g) {
+        g.setColor(Plant.PHASE_1);
+        g.fillRect(40, 40, 10, 10);
+        g.setColor(Plant.PHASE_2);
+        g.fillRect(40, 60, 10, 10);
+        g.setColor(Plant.PHASE_3);
+        g.fillRect(40, 80, 10, 10);
+
+        g.setFont(this.font16);
+        g.setColor(Color.black);
+        g.drawString("x" + this.score.getType1(), 85, 40 + 10);
+        g.drawString("x" + this.score.getType2(), 85, 60 + 10);
+        g.drawString("x" + this.score.getType3(), 85, 80 + 10);
+
+        g.drawString("Score", 40, 120);
+        g.drawString(Integer.toString(this.score.getScore()), 85, 120);
     }
 }
