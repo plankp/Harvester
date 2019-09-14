@@ -1,5 +1,6 @@
 package org.atoiks.games.harvest;
 
+import java.awt.Font;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Insets;
@@ -34,6 +35,9 @@ public class GameFrame extends JPanel {
     private boolean renderScoreOverlay = false;
     private boolean gameOver = false;
 
+    private final Font font16;
+    private final Font font48;
+
     private final double screenWidth;
     private final double screenHeight;
 
@@ -44,7 +48,10 @@ public class GameFrame extends JPanel {
 
     private final Score score = new Score();
 
-    public GameFrame() {
+    public GameFrame(Font fnt) {
+        this.font16 = fnt.deriveFont(16f);
+        this.font48 = fnt.deriveFont(48f);
+
         final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
         this.screenWidth = d.getWidth();
@@ -100,6 +107,13 @@ public class GameFrame extends JPanel {
             g.setColor(Color.gray);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+            if (this.gameOver) {
+                g.setFont(this.font48);
+                g.setColor(Color.black);
+                g.drawString("GAME OVER!", 200, 60);
+                g.translate(0, 80);
+            }
+
             g.setColor(Plant.PHASE_1);
             g.fillRect(40, 40, 10, 10);
             g.setColor(Plant.PHASE_2);
@@ -107,16 +121,13 @@ public class GameFrame extends JPanel {
             g.setColor(Plant.PHASE_3);
             g.fillRect(40, 80, 10, 10);
 
+            g.setFont(this.font16);
             g.setColor(Color.black);
             g.drawString("x" + this.score.getType1(), 70, 40 + 10);
             g.drawString("x" + this.score.getType2(), 70, 60 + 10);
             g.drawString("x" + this.score.getType3(), 70, 80 + 10);
 
             g.drawString("Score: " + this.score.getScore(), 40, 120);
-
-            if (this.gameOver) {
-                g.drawString("GAME OVER!", 40, 120);
-            }
         } else {
             g.setColor(Color.black);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());

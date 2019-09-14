@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import java.awt.Font;
 import java.awt.BorderLayout;
 
 import java.awt.event.WindowEvent;
@@ -16,8 +17,8 @@ public class Window {
     private final GameFrame gframe;
     private final JFrame frame;
 
-    public Window() {
-        this.gframe = new GameFrame();
+    public Window(Font fnt) {
+        this.gframe = new GameFrame(fnt);
 
         this.frame = new JFrame("Atoiks Games - Harvest");
         this.frame.add(this.gframe, BorderLayout.CENTER);
