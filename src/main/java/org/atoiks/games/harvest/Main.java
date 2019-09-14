@@ -12,7 +12,7 @@ public class Main {
         final Font fnt;
         try {
             fnt = Font
-                    .createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream("/Logisoso.ttf"))
+                    .createFont(Font.TRUETYPE_FONT, Main.class.getResourceAsStream("/font/Logisoso.ttf"))
                     .deriveFont(16f);
         } catch (NullPointerException | FontFormatException | IOException ex) {
             throw new RuntimeException("Font loading failed!", ex);
