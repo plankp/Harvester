@@ -34,7 +34,7 @@ public class GameFrame extends JPanel {
 
     private Insets insets;
 
-    private float time = 0;
+    private float time = (LIMIT_UPPER_BOUND + LIMIT_LOWER_BOUND) / 2;
     private float limit = LIMIT_UPPER_BOUND;
 
     private final Font font16;
