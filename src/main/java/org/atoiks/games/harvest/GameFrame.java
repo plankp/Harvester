@@ -198,8 +198,8 @@ public class GameFrame extends JPanel {
 
             GameFrame.this.genericScoreRender(g);
 
-            g.drawString("ETA", 40, 160);
-            g.drawString(String.format("%.2fs", Math.max(GameFrame.this.limit - GameFrame.this.time, 0)), 85, 160);
+            g.drawString("ETA", 40, 230);
+            g.drawString(String.format("%.2fs", Math.max(GameFrame.this.limit - GameFrame.this.time, 0)), 85, 230);
         }
 
         @Override
@@ -230,20 +230,17 @@ public class GameFrame extends JPanel {
     }
 
     private void genericScoreRender(Graphics2D g) {
-        g.setColor(Plant.PHASE_1);
-        g.fillRect(40, 40, 10, 10);
-        g.setColor(Plant.PHASE_2);
-        g.fillRect(40, 60, 10, 10);
-        g.setColor(Plant.PHASE_3);
-        g.fillRect(40, 80, 10, 10);
+        Plant.Phase.PHASE_1.renderImage(g, 40, 40, 30, 30);
+        Plant.Phase.PHASE_2.renderImage(g, 40, 100, 30, 30);
+        Plant.Phase.PHASE_3.renderImage(g, 40, 160, 30, 30);
 
         g.setFont(this.font16);
         g.setColor(Color.black);
-        g.drawString("x" + this.score.getType1(), 85, 40 + 10);
-        g.drawString("x" + this.score.getType2(), 85, 60 + 10);
-        g.drawString("x" + this.score.getType3(), 85, 80 + 10);
+        g.drawString("x" + this.score.getType1(), 85, 40 + 20);
+        g.drawString("x" + this.score.getType2(), 85, 100 + 20);
+        g.drawString("x" + this.score.getType3(), 85, 160 + 20);
 
-        g.drawString("Score", 40, 120);
-        g.drawString(Integer.toString(this.score.getScore()), 85, 120);
+        g.drawString("Score", 40, 210);
+        g.drawString(Integer.toString(this.score.getScore()), 85, 210);
     }
 }

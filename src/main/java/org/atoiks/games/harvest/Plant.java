@@ -1,12 +1,54 @@
 package org.atoiks.games.harvest;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import java.awt.geom.Rectangle2D;
 
 public class Plant {
+
+    public enum Phase {
+        PHASE_1 {
+            @Override
+            public void modifyScore(Score score) {
+                score.addType1();
+            }
+
+            @Override
+            public void renderImage(Graphics g, int x, int y, int w, int h) {
+                g.drawImage(GRASS_IMG, x, y, w, h, null);
+            }
+        },
+        PHASE_2 {
+            @Override
+            public void modifyScore(Score score) {
+                score.addType2();
+            }
+
+            @Override
+            public void renderImage(Graphics g, int x, int y, int w, int h) {
+                g.drawImage(FLOWER_1_IMG, x, y, w, h, null);
+            }
+        },
+        PHASE_3 {
+            @Override
+            public void modifyScore(Score score) {
+                score.addType3();
+            }
+
+            @Override
+            public void renderImage(Graphics g, int x, int y, int w, int h) {
+                g.drawImage(FLOWER_1_IMG, x, y, w, h, null);
+                g.drawImage(FLOWER_2_IMG, x, y, w, h, null);
+            }
+        };
+
+        public abstract void modifyScore(Score score);
+        public abstract void renderImage(Graphics g, int x, int y, int w, int h);
+    }
 
     private static final float IDLE_STATE = -1;
     private static final float START_STATE = 0;
@@ -14,9 +56,10 @@ public class Plant {
     private static final float PHASE_2_PERCENTAGE = 0.5f;
     private static final float PHASE_3_PERCENTAGE = 0.8f;
 
-    public static final Color PHASE_1 = Color.green;
-    public static final Color PHASE_2 = Color.yellow;
-    public static final Color PHASE_3 = Color.red;
+    // ---Provided by Main.java---
+    public static Image GRASS_IMG;
+    public static Image FLOWER_1_IMG;
+    public static Image FLOWER_2_IMG;
 
     static {
         // Sanity check
@@ -35,7 +78,7 @@ public class Plant {
 
     private float time = IDLE_STATE;
     private float limit = 5;
-    private Color color;
+    private Phase phase;
 
     public Plant(final double width, final double height, Score score) {
         this.rect = new Rectangle2D.Double(0, 0, width, height);
@@ -51,9 +94,9 @@ public class Plant {
         if (t > lim) {
             return false;
         } else if (t > lim * PHASE_3_PERCENTAGE) {
-            this.color = PHASE_3;
+            this.phase = Phase.PHASE_3;
         } else if (t > lim * PHASE_2_PERCENTAGE) {
-            this.color = PHASE_2;
+            this.phase = Phase.PHASE_2;
         }
         return true;
     }
@@ -64,21 +107,13 @@ public class Plant {
 
     public void startGrowing() {
         this.time = START_STATE;
-        this.color = PHASE_1;
+        this.phase = Phase.PHASE_1;
     }
 
     public void harvest() {
         if (!this.isGrowing()) return;
 
-        final Color c = this.color;
-        if (c == PHASE_1) {
-            this.score.addType1();
-        } else if (c == PHASE_2) {
-            this.score.addType2();
-        } else if (c == PHASE_3) {
-            this.score.addType3();
-        }
-
+        this.phase.modifyScore(this.score);
         this.time = IDLE_STATE;
     }
 
@@ -89,7 +124,6 @@ public class Plant {
     public void renderContent(Graphics2D g) {
         if (!this.isGrowing()) return;
 
-        g.setColor(this.color);
-        g.fill(this.rect);
+        this.phase.renderImage(g, 0, 0, (int) this.rect.width, (int) this.rect.height);
     }
 }
