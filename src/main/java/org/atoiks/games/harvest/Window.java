@@ -9,7 +9,9 @@ import java.awt.BorderLayout;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 
 import javax.swing.JFrame;
@@ -29,6 +31,7 @@ public class Window {
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         this.frame.addKeyListener(new KeyboardHandler());
+        this.frame.addMouseListener(new MouseHandler());
     }
 
     public void start() {
@@ -55,6 +58,14 @@ public class Window {
         @Override
         public void keyReleased(KeyEvent evt) {
             Window.this.gframe.onKeyReleased(evt);
+        }
+    }
+
+    private class MouseHandler extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent evt) {
+            Window.this.gframe.onMouseClicked(evt);
         }
     }
 }

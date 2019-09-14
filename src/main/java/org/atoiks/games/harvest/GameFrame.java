@@ -14,7 +14,6 @@ import java.awt.geom.Rectangle2D;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
 
 import java.util.Random;
 
@@ -70,8 +69,6 @@ public class GameFrame extends JPanel {
                 this.grid[i][j] = new Cell(this.cellWidth, this.cellHeight, this.score);
             }
         }
-
-        this.addMouseListener(new MouseInputHandler());
     }
 
     public void setInsets(Insets insets) {
@@ -183,26 +180,22 @@ public class GameFrame extends JPanel {
         }
     }
 
-    private class MouseInputHandler extends MouseAdapter {
+    public void onMouseClicked(MouseEvent evt) {
+        if (insets == null) return;
 
-        @Override
-        public void mouseClicked(MouseEvent evt) {
-            if (insets == null) return;
+        final int xScr = evt.getXOnScreen() - insets.left;
+        final int yScr = evt.getYOnScreen() - insets.top;
 
-            final int xScr = evt.getXOnScreen() - insets.left;
-            final int yScr = evt.getYOnScreen() - insets.top;
+        // Ignore out of grid clicks
+        if (xScr < PADDING_X || xScr > screenWidth - PADDING_X) return;
+        if (yScr < PADDING_Y || yScr > screenHeight - PADDING_Y) return;
 
-            // Ignore out of grid clicks
-            if (xScr < PADDING_X || xScr > screenWidth - PADDING_X) return;
-            if (yScr < PADDING_Y || yScr > screenHeight - PADDING_Y) return;
+        // Map it to virtual (grid) coordinates
 
-            // Map it to virtual (grid) coordinates
+        final int xCell = (int) ((xScr - PADDING_X) / cellWidth);
+        final int yCell = (int) ((yScr - PADDING_Y) / cellHeight);
 
-            final int xCell = (int) ((xScr - PADDING_X) / cellWidth);
-            final int yCell = (int) ((yScr - PADDING_Y) / cellHeight);
-
-            final Point2D p = getCellPoint(xCell, yCell);
-            grid[xCell][yCell].onClick(xScr - p.getX(), yScr - p.getY());
-        }
+        final Point2D p = getCellPoint(xCell, yCell);
+        grid[xCell][yCell].onClick(xScr - p.getX(), yScr - p.getY());
     }
 }
