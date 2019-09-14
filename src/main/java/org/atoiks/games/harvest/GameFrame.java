@@ -13,7 +13,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 
@@ -73,7 +72,6 @@ public class GameFrame extends JPanel {
         }
 
         this.addMouseListener(new MouseInputHandler());
-        this.addKeyListener(new KeyInputHandler());
     }
 
     public void setInsets(Insets insets) {
@@ -173,6 +171,18 @@ public class GameFrame extends JPanel {
         }
     }
 
+    public void onKeyPressed(KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_S) {
+            this.renderScoreOverlay = true;
+        }
+    }
+
+    public void onKeyReleased(KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_S) {
+            this.renderScoreOverlay = false;
+        }
+    }
+
     private class MouseInputHandler extends MouseAdapter {
 
         @Override
@@ -193,23 +203,6 @@ public class GameFrame extends JPanel {
 
             final Point2D p = getCellPoint(xCell, yCell);
             grid[xCell][yCell].onClick(xScr - p.getX(), yScr - p.getY());
-        }
-    }
-
-    private class KeyInputHandler extends KeyAdapter {
-
-        @Override
-        public void keyPressed(KeyEvent evt) {
-            if (evt.getKeyCode() == KeyEvent.VK_S) {
-                renderScoreOverlay = true;
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent evt) {
-            if (evt.getKeyCode() == KeyEvent.VK_S) {
-                renderScoreOverlay = false;
-            }
         }
     }
 }

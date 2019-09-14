@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 import java.awt.Font;
 import java.awt.BorderLayout;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
@@ -25,6 +27,8 @@ public class Window {
         this.frame.setIgnoreRepaint(true);
         this.frame.setAlwaysOnTop(true);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        this.frame.addKeyListener(new KeyboardHandler());
     }
 
     public void start() {
@@ -32,7 +36,6 @@ public class Window {
         this.frame.setLocationRelativeTo(null);
         this.frame.setResizable(false);
         this.frame.setVisible(true);
-        this.gframe.requestFocus();
 
         this.gframe.setInsets(this.frame.getInsets());
     }
@@ -40,5 +43,18 @@ public class Window {
     public void update(final float dt) {
         this.gframe.update(0.020f);
         this.frame.repaint();
+    }
+
+    private class KeyboardHandler extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent evt) {
+            Window.this.gframe.onKeyPressed(evt);
+        }
+
+        @Override
+        public void keyReleased(KeyEvent evt) {
+            Window.this.gframe.onKeyReleased(evt);
+        }
     }
 }
