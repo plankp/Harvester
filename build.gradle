@@ -13,11 +13,11 @@ task copyLicense {
     outputs.file new File("$buildDir/README.md")
     doLast {
         copy {
-            from "../COPYING"
+            from "COPYING"
             into "$buildDir"
         }
         copy {
-            from "../README.md"
+            from "README.md"
             into "$buildDir"
         }
     }
