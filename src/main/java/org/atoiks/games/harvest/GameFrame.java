@@ -8,9 +8,9 @@ import java.awt.Toolkit;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -87,7 +87,9 @@ public class GameFrame extends JPanel {
 
     @Override
     public void paintComponent(final Graphics gr) {
-        this.currentState.render((Graphics2D) gr);
+        final Graphics2D g = (Graphics2D) gr;
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+        this.currentState.render(g);
     }
 
     public void onKeyPressed(KeyEvent evt) {
