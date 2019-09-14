@@ -50,7 +50,7 @@ public class GameFrame extends JPanel {
 
     private final Score score = new Score();
 
-    private State currentState = new GamePlayState();
+    private State currentState = new TitleState();
 
     public GameFrame(Font fnt) {
         this.font16 = fnt.deriveFont(16f);
@@ -104,6 +104,41 @@ public class GameFrame extends JPanel {
         this.currentState.onMouseClicked(evt);
     }
 
+    private class TitleState implements State {
+
+        // Magic numbers: -140 to 600
+        private float x = -140;
+
+        @Override
+        public void update(float dt) {
+            if ((this.x -= dt * 80) < -140) {
+                this.x = 600;
+            }
+        }
+
+        @Override
+        public void render(Graphics2D g) {
+            g.setColor(Color.black);
+            g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
+
+            g.setFont(GameFrame.this.font48);
+            g.setColor(Color.white);
+            g.drawString("Harvester", 200, 60);
+
+            g.setFont(GameFrame.this.font16);
+            g.drawString("Click anywhere on screen to start", 176, 180);
+            g.drawString("Mouse is highly recommended!", 193, 200);
+            g.drawString("Made by Atoiks Games", this.x, 400);
+
+            GameFrame.this.genericGameRender(g);
+        }
+
+        @Override
+        public void onMouseClicked(MouseEvent evt) {
+            GameFrame.this.currentState = new GamePlayState();
+        }
+    }
+
     private class GamePlayState implements State {
 
         @Override
@@ -136,26 +171,7 @@ public class GameFrame extends JPanel {
             g.setColor(Color.black);
             g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
 
-            if (insets == null) return;
-
-            final Point origin = GameFrame.this.getLocationOnScreen();
-            final double tx = GameFrame.this.insets.left - origin.getX();
-            final double ty = GameFrame.this.insets.top - origin.getY();
-            g.translate(tx, ty);
-
-            for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
-                for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
-                    final Point2D p = GameFrame.this.getCellPoint(i, j);
-                    g.translate(p.getX(), p.getY());
-
-                    final Cell cell = GameFrame.this.grid[i][j];
-                    g.setColor(Color.white);
-                    cell.renderOutline(g);
-                    cell.renderPlants(g);
-
-                    g.translate(-p.getX(), -p.getY());
-                }
-            }
+            GameFrame.this.genericGameRender(g);
         }
 
         @Override
@@ -242,5 +258,28 @@ public class GameFrame extends JPanel {
 
         g.drawString("Score", 40, 210);
         g.drawString(Integer.toString(this.score.getScore()), 85, 210);
+    }
+
+    private void genericGameRender(Graphics2D g) {
+        if (insets == null) return;
+
+        final Point origin = GameFrame.this.getLocationOnScreen();
+        final double tx = GameFrame.this.insets.left - origin.getX();
+        final double ty = GameFrame.this.insets.top - origin.getY();
+        g.translate(tx, ty);
+
+        for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
+            for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
+                final Point2D p = GameFrame.this.getCellPoint(i, j);
+                g.translate(p.getX(), p.getY());
+
+                final Cell cell = GameFrame.this.grid[i][j];
+                g.setColor(Color.white);
+                cell.renderOutline(g);
+                cell.renderPlants(g);
+
+                g.translate(-p.getX(), -p.getY());
+            }
+        }
     }
 }
