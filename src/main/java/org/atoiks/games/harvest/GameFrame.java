@@ -25,6 +25,9 @@ public class GameFrame extends JPanel {
 
     private static final Random RAND_GEN = new Random();
 
+    private static final float LIMIT_UPPER_BOUND = 5.0f;
+    private static final float LIMIT_LOWER_BOUND = 1.5f;
+
     private static final int VIRTUAL_WIDTH = 6;
     private static final int VIRTUAL_HEIGHT = 4;
 
@@ -34,6 +37,9 @@ public class GameFrame extends JPanel {
     private Insets insets;
     private boolean renderScoreOverlay = false;
     private boolean gameOver = false;
+
+    private float time = 0;
+    private float limit = LIMIT_UPPER_BOUND;
 
     private final Font font16;
     private final Font font48;
@@ -86,10 +92,18 @@ public class GameFrame extends JPanel {
             }
         }
 
-        // Randomly select a cell to try to grow!
-        final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
-        final int y = RAND_GEN.nextInt(VIRTUAL_HEIGHT);
-        this.grid[x][y].requestGrowing();
+        if ((this.time += dt) > this.limit) {
+            // Reset timer
+            this.time -= this.limit;
+
+            // Make growth-trigger go faster
+            this.limit = Math.max(this.limit - dt, LIMIT_LOWER_BOUND);
+
+            // Randomly select a cell to try to grow!
+            final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
+            final int y = RAND_GEN.nextInt(VIRTUAL_HEIGHT);
+            this.grid[x][y].requestGrowing();
+        }
     }
 
     private Point2D getCellPoint(int i, int j) {
@@ -123,11 +137,17 @@ public class GameFrame extends JPanel {
 
             g.setFont(this.font16);
             g.setColor(Color.black);
-            g.drawString("x" + this.score.getType1(), 70, 40 + 10);
-            g.drawString("x" + this.score.getType2(), 70, 60 + 10);
-            g.drawString("x" + this.score.getType3(), 70, 80 + 10);
+            g.drawString("x" + this.score.getType1(), 85, 40 + 10);
+            g.drawString("x" + this.score.getType2(), 85, 60 + 10);
+            g.drawString("x" + this.score.getType3(), 85, 80 + 10);
 
-            g.drawString("Score: " + this.score.getScore(), 40, 120);
+            g.drawString("Score", 40, 120);
+            g.drawString(Integer.toString(this.score.getScore()), 85, 120);
+
+            if (this.renderScoreOverlay) {
+                g.drawString("ETA", 40, 160);
+                g.drawString(String.format("%.2fs", Math.max(this.limit - this.time, 0)), 85, 160);
+            }
         } else {
             g.setColor(Color.black);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
