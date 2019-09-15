@@ -28,6 +28,8 @@ public class GameFrame extends JPanel {
     private static final float LIMIT_UPPER_BOUND = 5.0f;
     private static final float LIMIT_LOWER_BOUND = 1.5f;
 
+    private static final float RADAR_TIME = 0.1f;
+
     private static final int VIRTUAL_WIDTH = 6;
     private static final int VIRTUAL_HEIGHT = 4;
 
@@ -53,6 +55,8 @@ public class GameFrame extends JPanel {
     private final Score score = new Score();
 
     private State currentState = new TitleState();
+
+    private float radarTime = 0;
 
     public GameFrame(Font fnt) {
         this.font16 = fnt.deriveFont(16f);
@@ -154,6 +158,8 @@ public class GameFrame extends JPanel {
                 }
             }
 
+            GameFrame.this.radarTime = Math.max(0, GameFrame.this.radarTime -= dt);
+
             if ((GameFrame.this.time += dt) > GameFrame.this.limit) {
                 // Reset timer
                 GameFrame.this.time -= GameFrame.this.limit;
@@ -170,13 +176,15 @@ public class GameFrame extends JPanel {
                     } catch (LineUnavailableException ex) {
                         // Ignore, welp...
                     }
+
+                    GameFrame.this.radarTime = RADAR_TIME;
                 }
             }
         }
 
         @Override
         public void render(Graphics2D g) {
-            g.setColor(Color.black);
+            g.setColor(GameFrame.this.radarTime > 0 ? Color.cyan : Color.black);
             g.fillRect(0, 0, GameFrame.this.getWidth(), GameFrame.this.getHeight());
 
             GameFrame.this.genericGameRender(g);

@@ -11,7 +11,7 @@ Run `gradlew build` to build it or `gradlew run` to run after building
 ## Game Instructions
 
 *   Over time, plants will spawn randomly in the field
-*   When this happens, the game will notify you with a beep sound
+*   When this happens, the screen will flash and beep
 *   Click on grass or flowers to harvest them (a.k.a **_gain points_**)
 
 ### Notes
