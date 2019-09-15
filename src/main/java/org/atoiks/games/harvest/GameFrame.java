@@ -19,6 +19,8 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
+import javax.sound.sampled.LineUnavailableException;
+
 public class GameFrame extends JPanel {
 
     private static final Random RAND_GEN = new Random();
@@ -162,7 +164,13 @@ public class GameFrame extends JPanel {
                 // Randomly select a cell to try to grow!
                 final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
                 final int y = RAND_GEN.nextInt(VIRTUAL_HEIGHT);
-                GameFrame.this.grid[x][y].requestGrowing();
+                if (GameFrame.this.grid[x][y].requestGrowing()) {
+                    try {
+                        SoundUtils.tone(1000, 20);
+                    } catch (LineUnavailableException ex) {
+                        // Ignore, welp...
+                    }
+                }
             }
         }
 

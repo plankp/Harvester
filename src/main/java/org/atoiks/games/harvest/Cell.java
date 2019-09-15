@@ -9,8 +9,6 @@ import java.awt.geom.Rectangle2D;
 
 import java.util.Random;
 
-import javax.sound.sampled.LineUnavailableException;
-
 public class Cell {
 
     private static final Random RAND_GEN = new Random();
@@ -48,21 +46,17 @@ public class Cell {
         return true;
     }
 
-    public void requestGrowing() {
+    public boolean requestGrowing() {
         // Randomly select a plant-cell
         final int x = RAND_GEN.nextInt(VIRTUAL_SIDE);
         final int y = RAND_GEN.nextInt(VIRTUAL_SIDE);
         final PlantCell cell = this.grid[x][y];
 
         // Only grow if it is vacant
-        if (!cell.isGrowing()) {
-            cell.startGrowing();
-            try {
-                SoundUtils.tone(1000, 20);
-            } catch (LineUnavailableException ex) {
-                // Ignore, welp...
-            }
-        }
+        if (cell.isGrowing()) return false;
+
+        cell.startGrowing();
+        return true;
     }
 
     public void onClick(double x, double y) {
