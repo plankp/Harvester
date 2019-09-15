@@ -279,17 +279,17 @@ public class GameFrame extends JPanel {
     private void genericGameRender(Graphics2D g) {
         if (insets == null) return;
 
-        final Point origin = GameFrame.this.getLocationOnScreen();
-        final double tx = GameFrame.this.insets.left - origin.getX();
-        final double ty = GameFrame.this.insets.top - origin.getY();
+        final Point origin = this.getLocationOnScreen();
+        final double tx = this.insets.left - origin.getX();
+        final double ty = this.insets.top - origin.getY();
         g.translate(tx, ty);
 
         for (int i = 0; i < VIRTUAL_WIDTH; ++i) {
             for (int j = 0; j < VIRTUAL_HEIGHT; ++j) {
-                final Point2D p = GameFrame.this.getCellPoint(i, j);
+                final Point2D p = this.getCellPoint(i, j);
                 g.translate(p.getX(), p.getY());
 
-                final Cell cell = GameFrame.this.grid[i][j];
+                final Cell cell = this.grid[i][j];
                 g.setColor(Color.white);
                 cell.renderOutline(g);
                 cell.renderPlants(g);
