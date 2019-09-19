@@ -38,7 +38,7 @@ public final class Score {
 
     public int getScore() {
         return this.countType1
-            + this.countType2 << 1
-            + this.countType3 << 2;
+            + (this.countType2 << 1)
+            + (this.countType3 << 2);
     }
 }
