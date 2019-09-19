@@ -27,6 +27,7 @@ public class GameFrame extends JPanel {
 
     private static final float LIMIT_UPPER_BOUND = 5.0f;
     private static final float LIMIT_LOWER_BOUND = 1.5f;
+    private static final float LIMIT_FACTOR = 1.32f;
 
     private static final float RADAR_TIME = 0.1f;
 
@@ -165,7 +166,7 @@ public class GameFrame extends JPanel {
                 GameFrame.this.time -= GameFrame.this.limit;
 
                 // Make growth-trigger go faster
-                GameFrame.this.limit = Math.max(GameFrame.this.limit - dt, LIMIT_LOWER_BOUND);
+                GameFrame.this.limit = Math.max(GameFrame.this.limit - dt * LIMIT_FACTOR, LIMIT_LOWER_BOUND);
 
                 // Randomly select a cell to try to grow!
                 final int x = RAND_GEN.nextInt(VIRTUAL_WIDTH);
